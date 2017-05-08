@@ -4,9 +4,9 @@ ASP.NET Web API OWIN integration for Stashbox which provides the same functional
 ## Usage
 You can use the lifetime support which comes from the Stashbox.Owin package, it can be useful when you have custom middlewares also and you'd like to use the same scoped dependencies as your controllers using within the same scope.
 ```c#
-public static class WebApiConfig
+public class Startup
 {
-    public static void Register(HttpConfiguration config)
+    public void Configuration(IAppBuilder app)
     {
         //configure container
         var container = new StashboxContainer();
@@ -29,9 +29,9 @@ public static class WebApiConfig
 ## Without the OWIN scope support
 If you don't want to use the scope middleware, you can let the WebApi just use the `IDependencyResolver` implementation provided by the standard WebApi Stashbox integration.
 ```c#
-public static class WebApiConfig
+public class Startup
 {
-    public static void Register(HttpConfiguration config)
+    public void Configuration(IAppBuilder app)
     {
         //configure container
         var container = new StashboxContainer();
