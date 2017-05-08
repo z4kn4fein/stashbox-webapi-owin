@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Owin;
@@ -17,6 +18,7 @@ namespace Stashbox.AspNet.WebApi.Owin.Tests
              {
                  var config = new HttpConfiguration { IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always };
                  var container = new StashboxContainer();
+                 container.RegisterType<TestMiddleware>();
                  container.RegisterScoped<Test>();
 
                  config.MapHttpAttributeRoutes();
@@ -25,10 +27,10 @@ namespace Stashbox.AspNet.WebApi.Owin.Tests
              }))
             {
                 var resp = await server.HttpClient.GetAsync("/api/test/value");
-                Assert.AreEqual("\"1test1test1\"", await resp.Content.ReadAsStringAsync());
+                Assert.AreEqual("test1\"1test1test1\"", await resp.Content.ReadAsStringAsync());
 
                 resp = await server.HttpClient.GetAsync("/api/test/value");
-                Assert.AreEqual("\"2test2test2\"", await resp.Content.ReadAsStringAsync());
+                Assert.AreEqual("test2\"2test2test2\"", await resp.Content.ReadAsStringAsync());
             }
         }
     }
@@ -65,6 +67,22 @@ namespace Stashbox.AspNet.WebApi.Owin.Tests
         public IHttpActionResult GetValue()
         {
             return this.Ok(controllerCounter + this.test.Value + this.test1.Value);
+        }
+    }
+
+    public class TestMiddleware : OwinMiddleware
+    {
+        private readonly Test test;
+
+        public TestMiddleware(OwinMiddleware next, Test test) : base(next)
+        {
+            this.test = test;
+        }
+
+        public override async Task Invoke(IOwinContext context)
+        {
+            await context.Response.WriteAsync(this.test.Value);
+            await this.Next.Invoke(context);
         }
     }
 }
