@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -78,7 +79,9 @@ namespace Stashbox.AspNet.WebApi.Owin.Tests
             var fieldInfo = typeof(StashboxDependencyScope).GetField("dependencyResolver", BindingFlags.Instance | BindingFlags.NonPublic);
             var scopeResolver = fieldInfo.GetValue(scope);
 
-            var scopeSame = this.resolver == this.context.GetCurrentStashboxScope() && this.resolver == scopeResolver;
+            var ctx = this.Request.GetOwinContext();
+
+            var scopeSame = this.resolver == this.context.GetCurrentStashboxScope() && this.resolver == scopeResolver && this.context == ctx;
             return this.Ok(controllerCounter + this.test.Value + this.test1.Value + scopeSame);
         }
     }
