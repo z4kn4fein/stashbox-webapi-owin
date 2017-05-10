@@ -1,10 +1,14 @@
-﻿using System.Threading;
+﻿using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Hosting;
 using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Owin;
+using Stashbox.Infrastructure;
+using Stashbox.Web.WebApi;
 
 namespace Stashbox.AspNet.WebApi.Owin.Tests
 {
@@ -27,10 +31,10 @@ namespace Stashbox.AspNet.WebApi.Owin.Tests
              }))
             {
                 var resp = await server.HttpClient.GetAsync("/api/test/value");
-                Assert.AreEqual("test1\"1test1test1\"", await resp.Content.ReadAsStringAsync());
+                Assert.AreEqual("test1\"1test1test1True\"", await resp.Content.ReadAsStringAsync());
 
                 resp = await server.HttpClient.GetAsync("/api/test/value");
-                Assert.AreEqual("test2\"2test2test2\"", await resp.Content.ReadAsStringAsync());
+                Assert.AreEqual("test2\"2test2test2True\"", await resp.Content.ReadAsStringAsync());
             }
         }
     }
@@ -52,13 +56,17 @@ namespace Stashbox.AspNet.WebApi.Owin.Tests
     {
         private readonly Test test;
         private readonly Test test1;
+        private readonly IOwinContext context;
+        private readonly IDependencyResolver resolver;
 
         private static int controllerCounter;
 
-        public Test2Controller(Test test, Test test1)
+        public Test2Controller(Test test, Test test1, IOwinContext context, IDependencyResolver resolver)
         {
             this.test = test;
             this.test1 = test1;
+            this.context = context;
+            this.resolver = resolver;
             Interlocked.Increment(ref controllerCounter);
         }
 
@@ -66,7 +74,12 @@ namespace Stashbox.AspNet.WebApi.Owin.Tests
         [Route("value")]
         public IHttpActionResult GetValue()
         {
-            return this.Ok(controllerCounter + this.test.Value + this.test1.Value);
+            var scope = (StashboxDependencyScope)this.Request.Properties[HttpPropertyKeys.DependencyScope];
+            var fieldInfo = typeof(StashboxDependencyScope).GetField("dependencyResolver", BindingFlags.Instance | BindingFlags.NonPublic);
+            var scopeResolver = fieldInfo.GetValue(scope);
+
+            var scopeSame = this.resolver == this.context.GetCurrentStashboxScope() && this.resolver == scopeResolver;
+            return this.Ok(controllerCounter + this.test.Value + this.test1.Value + scopeSame);
         }
     }
 
