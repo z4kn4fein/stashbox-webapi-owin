@@ -1,12 +1,12 @@
-﻿using System.Net.Http;
+﻿using Microsoft.Owin;
+using Owin;
+using Stashbox;
+using Stashbox.Utils;
+using Stashbox.Web.WebApi;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Hosting;
-using Microsoft.Owin;
-using Owin;
-using Stashbox.Infrastructure;
-using Stashbox.Utils;
-using Stashbox.Web.WebApi;
 
 namespace System.Web.Http
 {

@@ -1,15 +1,14 @@
-﻿using System.Net.Http;
+﻿using Microsoft.Owin;
+using Microsoft.Owin.Testing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Owin;
+using Stashbox.Web.WebApi;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Hosting;
-using Microsoft.Owin;
-using Microsoft.Owin.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Owin;
-using Stashbox.Infrastructure;
-using Stashbox.Web.WebApi;
 
 namespace Stashbox.AspNet.WebApi.Owin.Tests
 {
