@@ -22,7 +22,7 @@ namespace Stashbox.AspNet.WebApi.Owin.Tests
              {
                  var config = new HttpConfiguration { IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always };
                  var container = new StashboxContainer();
-                 container.RegisterType<TestMiddleware>();
+                 container.Register<TestMiddleware>();
                  container.RegisterScoped<Test>();
 
                  config.MapHttpAttributeRoutes();
